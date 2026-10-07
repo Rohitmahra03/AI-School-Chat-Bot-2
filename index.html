@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>School AI Assistant</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Inter,Segoe UI,Arial,sans-serif;
+}
+
+body{
+    min-height:100vh;
+    background:
+        radial-gradient(circle at top left,#263b72 0%,transparent 35%),
+        radial-gradient(circle at bottom right,#123f55 0%,transparent 35%),
+        #080d18;
+    color:#fff;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.app{
+    width:100%;
+    max-width:1100px;
+    height:90vh;
+    min-height:600px;
+    display:flex;
+    overflow:hidden;
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:25px;
+    background:rgba(13,19,34,.88);
+    backdrop-filter:blur(20px);
+    box-shadow:0 30px 80px rgba(0,0,0,.45);
+}
+
+/* SIDEBAR */
+
+.sidebar{
+    width:270px;
+    background:rgba(255,255,255,.035);
+    border-right:1px solid rgba(255,255,255,.08);
+    padding:22px;
+    display:flex;
+    flex-direction:column;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:30px;
+}
+
+.logo-icon{
+    width:45px;
+    height:45px;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:24px;
+    background:linear-gradient(135deg,#6d5dfc,#00c6ff);
+    box-shadow:0 10px 30px rgba(0,198,255,.25);
+}
+
+.logo h2{
+    font-size:18px;
+}
+
+.logo span{
+    font-size:11px;
+    color:#94a3b8;
+}
+
+.new-chat{
+    width:100%;
+    border:0;
+    padding:13px;
+    border-radius:12px;
+    background:linear-gradient(135deg,#6657f5,#168bd0);
+    color:white;
+    font-weight:700;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.new-chat:hover{
+    transform:translateY(-2px);
+}
+
+.menu-title{
+    margin-top:30px;
+    margin-bottom:12px;
+    color:#64748b;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+}
+
+.subject{
+    padding:11px 12px;
+    border-radius:10px;
+    color:#cbd5e1;
+    margin-bottom:5px;
+    cursor:pointer;
+    font-size:14px;
+}
+
+.subject:hover{
+    background:rgba(255,255,255,.06);
+    color:white;
+}
+
+.sidebar-bottom{
+    margin-top:auto;
+    color:#64748b;
+    font-size:12px;
+    line-height:1.6;
+}
+
+/* MAIN */
+
+.main{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    min-width:0;
+}
+
+.header{
+    height:75px;
+    padding:0 25px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.header-left{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.status{
+    width:10px;
+    height:10px;
+    background:#22c55e;
+    border-radius:50%;
+    box-shadow:0 0 12px #22c55e;
+}
+
+.header h3{
+    font-size:16px;
+}
+
+.header p{
+    color:#64748b;
+    font-size:11px;
+}
+
+.badge{
+    padding:7px 11px;
+    border-radius:20px;
+    background:rgba(34,197,94,.1);
+    color:#4ade80;
+    font-size:11px;
+}
+
+/* CHAT */
+
+.chat{
+    flex:1;
+    overflow-y:auto;
+    padding:30px;
+    scroll-behavior:smooth;
+}
+
+.welcome{
+    max-width:700px;
+    margin:40px auto;
+    text-align:center;
+}
+
+.welcome-icon{
+    width:75px;
+    height:75px;
+    margin:auto;
+    border-radius:23px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:40px;
+    background:linear-gradient(135deg,#6657f5,#00b8e6);
+    box-shadow:0 15px 40px rgba(0,180,230,.25);
+}
+
+.welcome h1{
+    margin-top:20px;
+    font-size:30px;
+}
+
+.welcome p{
+    color:#94a3b8;
+    margin-top:10px;
+    line-height:1.6;
+}
+
+.suggestions{
+    margin-top:25px;
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+}
+
+.suggestion{
+    padding:15px;
+    text-align:left;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:14px;
+    background:rgba(255,255,255,.035);
+    color:#cbd5e1;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.suggestion:hover{
+    background:rgba(255,255,255,.07);
+    transform:translateY(-2px);
+}
+
+/* MESSAGE */
+
+.message{
+    display:flex;
+    gap:12px;
+    margin-bottom:25px;
+    max-width:850px;
+}
+
+.message.user{
+    margin-left:auto;
+    flex-direction:row-reverse;
+}
+
+.avatar{
+    flex:none;
+    width:38px;
+    height:38px;
+    border-radius:12px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(135deg,#6657f5,#00a9dc);
+}
+
+.user .avatar{
+    background:#243047;
+}
+
+.bubble{
+    max-width:75%;
+    padding:14px 17px;
+    border-radius:16px;
+    background:rgba(255,255,255,.055);
+    color:#e2e8f0;
+    line-height:1.65;
+    white-space:pre-wrap;
+    word-break:break-word;
+}
+
+.user .bubble{
+    background:linear-gradient(135deg,#5145d9,#176eaa);
+    color:white;
+}
+
+/* INPUT */
+
+.input-area{
+    padding:18px 25px 22px;
+    border-top:1px solid rgba(255,255,255,.08);
+}
+
+.input-box{
+    display:flex;
+    align-items:flex-end;
+    gap:10px;
+    padding:10px;
+    background:#111a2b;
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:17px;
+}
+
+textarea{
+    flex:1;
+    resize:none;
+    max-height:130px;
+    min-height:42px;
+    background:transparent;
+    border:0;
+    outline:none;
+    color:white;
+    font-size:14px;
+    padding:10px;
+}
+
+textarea::placeholder{
+    color:#64748b;
+}
+
+.send{
+    width:44px;
+    height:44px;
+    border:0;
+    border-radius:13px;
+    background:linear-gradient(135deg,#6657f5,#00a8dd);
+    color:white;
+    font-size:19px;
+    cursor:pointer;
+}
+
+.send:disabled{
+    opacity:.5;
+    cursor:not-allowed;
+}
+
+.disclaimer{
+    text-align:center;
+    color:#475569;
+    font-size:10px;
+    margin-top:9px;
+}
+
+/* TYPING */
+
+.typing{
+    display:flex;
+    gap:5px;
+    padding:5px;
+}
+
+.typing span{
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    background:#94a3b8;
+    animation:bounce 1s infinite;
+}
+
+.typing span:nth-child(2){
+    animation-delay:.15s;
+}
+
+.typing span:nth-child(3){
+    animation-delay:.3s;
+}
+
+@keyframes bounce{
+    0%,60%,100%{transform:translateY(0)}
+    30%{transform:translateY(-5px)}
+}
+
+/* MOBILE */
+
+@media(max-width:750px){
+
+    body{
+        padding:0;
+    }
+
+    .app{
+        height:100vh;
+        min-height:100vh;
+        border-radius:0;
+        border:0;
+    }
+
+    .sidebar{
+        display:none;
+    }
+
+    .header{
+        padding:0 16px;
+    }
+
+    .chat{
+        padding:20px 15px;
+    }
+
+    .welcome{
+        margin:30px auto;
+    }
+
+    .welcome h1{
+        font-size:24px;
+    }
+
+    .suggestions{
+        grid-template-columns:1fr;
+    }
+
+    .bubble{
+        max-width:85%;
+    }
+
+    .input-area{
+        padding:12px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            <div class="logo-icon">🎓</div>
+            <div>
+                <h2>School AI</h2>
+                <span>Smart Learning Assistant</span>
+            </div>
+        </div>
+
+        <button class="new-chat" onclick="newChat()">
+            ＋ New Chat
+        </button>
+
+        <div class="menu-title">Subjects</div>
+
+        <div class="subject" onclick="askSubject('Mathematics')">
+            📐 Mathematics
+        </div>
+
+        <div class="subject" onclick="askSubject('Science')">
+            🔬 Science
+        </div>
+
+        <div class="subject" onclick="askSubject('English')">
+            📖 English
+        </div>
+
+        <div class="subject" onclick="askSubject('Hindi')">
+            🪔 Hindi
+        </div>
+
+        <div class="subject" onclick="askSubject('History')">
+            🏛️ History
+        </div>
+
+        <div class="subject" onclick="askSubject('Geography')">
+            🌍 Geography
+        </div>
+
+        <div class="subject" onclick="askSubject('General Knowledge')">
+            🧠 GK
+        </div>
+
+        <div class="sidebar-bottom">
+            Powered by Groq AI<br>
+            Made for students
+        </div>
+
+    </aside>
+
+    <!-- MAIN -->
+
+    <main class="main">
+
+        <header class="header">
+
+            <div class="header-left">
+                <div class="status"></div>
+
+                <div>
+                    <h3>School AI Assistant</h3>
+                    <p>Ask anything about your studies</p>
+                </div>
+            </div>
+
+            <div class="badge">
+                ● Online
+            </div>
+
+        </header>
+
+        <!-- CHAT -->
+
+        <section class="chat" id="chat">
+
+            <div class="welcome" id="welcome">
+
+                <div class="welcome-icon">
+                    🤖
+                </div>
+
+                <h1>How can I help you learn?</h1>
+
+                <p>
+                    Ask me questions about Maths, Science, History,
+                    English, Hindi, GK and many other school subjects.
+                </p>
+
+                <div class="suggestions">
+
+                    <div class="suggestion"
+                         onclick="useSuggestion('Explain Newton’s Second Law of Motion in simple Hindi.')">
+                        ⚡ Explain Newton's Second Law
+                    </div>
+
+                    <div class="suggestion"
+                         onclick="useSuggestion('Solve this mathematics problem step by step: 2x + 5 = 17')">
+                        📐 Solve a Maths problem
+                    </div>
+
+                    <div class="suggestion"
+                         onclick="useSuggestion('भारत के बारे में 5 महत्वपूर्ण सामान्य ज्ञान प्रश्न पूछो।')">
+                        🇮🇳 Ask me India GK
+                    </div>
+
+                    <div class="suggestion"
+                         onclick="useSuggestion('Explain photosynthesis in simple language.')">
+                        🌱 Explain Photosynthesis
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- INPUT -->
+
+        <div class="input-area">
+
+            <div class="input-box">
+
+                <textarea
+                    id="input"
+                    placeholder="Ask your question..."
+                    rows="1"
+                    onkeydown="handleKey(event)"
+                ></textarea>
+
+                <button
+                    class="send"
+                    id="send"
+                    onclick="sendMessage()">
+                    ➤
+                </button>
+
+            </div>
+
+            <div class="disclaimer">
+                School AI can make mistakes. Verify important information.
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   GROQ CONFIGURATION
+   ===================================================== */
+
+/*
+   अपनी Groq API Key यहां डालें.
+
+   Example:
+   const GROQ_API_KEY = "gsk_xxxxxxxxxxxxxxxxx";
+*/
+
+const GROQ_API_KEY = "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";
+
+
+/*
+   Groq API endpoint
+*/
+
+const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
+
+
+/*
+   Model
+
+   अगर यह model आपके Groq account में उपलब्ध न हो,
+   तो Groq Console में उपलब्ध किसी current model का नाम डालें.
+*/
+
+const MODEL = "openai/gpt-oss-120b";
+
+
+/* =====================================================
+   CHAT MEMORY
+   ===================================================== */
+
+let messages = [];
+
+
+/* =====================================================
+   SEND MESSAGE
+   ===================================================== */
+
+async function sendMessage(){
+
+    const input = document.getElementById("input");
+    const text = input.value.trim();
+
+    if(!text) return;
+
+    if(GROQ_API_KEY === "YOUR_GROQ_API_KEY"){
+
+        addMessage(
+            "assistant",
+            "⚠️ पहले JavaScript में अपनी Groq API key डालें।"
+        );
+
+        return;
+    }
+
+    removeWelcome();
+
+    addMessage("user", text);
+
+    input.value = "";
+    input.style.height = "42px";
+
+    messages.push({
+        role:"user",
+        content:text
+    });
+
+    setLoading(true);
+
+    try{
+
+        const response = await fetch(GROQ_URL,{
+
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/json",
+                "Authorization":"Bearer " + GROQ_API_KEY
+            },
+
+            body:JSON.stringify({
+
+                model:MODEL,
+
+                messages:[
+                    {
+                        role:"system",
+                        content:`
+You are School AI Assistant.
+
+You are designed to help school students learn.
+
+Rules:
+1. Explain concepts clearly and simply.
+2. Prefer Hindi/Hinglish when the student asks in Hindi/Hinglish.
+3. Use English when the student asks in English.
+4. For mathematics, show step-by-step solutions.
+5. For science, explain concepts with examples.
+6. Never intentionally give misleading information.
+7. Keep answers appropriate for school students.
+8. If a question is unclear, ask for clarification.
+9. Use headings and bullet points when useful.
+10. Encourage learning instead of simply giving unexplained answers.
+`
+                    },
+
+                    ...messages
+                ],
+
+                temperature:0.5,
+
+                max_tokens:1200
+
+            })
+
+        });
+
+
+        const data = await response.json();
+
+
+        if(!response.ok){
+
+            throw new Error(
+                data?.error?.message ||
+                "Groq API request failed."
+            );
+
+        }
+
+
+        const answer =
+            data?.choices?.[0]?.message?.content ||
+            "Sorry, I could not generate an answer.";
+
+
+        messages.push({
+            role:"assistant",
+            content:answer
+        });
+
+
+        addMessage("assistant",answer);
+
+
+    }catch(error){
+
+        console.error(error);
+
+        addMessage(
+            "assistant",
+            "❌ Error: " + error.message +
+            "\n\nकृपया अपनी API key, internet connection और model name check करें।"
+        );
+
+    }finally{
+
+        setLoading(false);
+
+    }
+
+}
+
+
+/* =====================================================
+   ADD MESSAGE TO UI
+   ===================================================== */
+
+function addMessage(role,text){
+
+    const chat = document.getElementById("chat");
+
+    const wrapper = document.createElement("div");
+
+    wrapper.className =
+        "message " + role;
+
+
+    const avatar = document.createElement("div");
+
+    avatar.className = "avatar";
+
+    avatar.textContent =
+        role === "user" ? "👤" : "🤖";
+
+
+    const bubble = document.createElement("div");
+
+    bubble.className = "bubble";
+
+    bubble.textContent = text;
+
+
+    wrapper.appendChild(avatar);
+    wrapper.appendChild(bubble);
+
+    chat.appendChild(wrapper);
+
+    chat.scrollTop = chat.scrollHeight;
+
+}
+
+
+/* =====================================================
+   LOADING
+   ===================================================== */
+
+function setLoading(isLoading){
+
+    const button = document.getElementById("send");
+
+    button.disabled = isLoading;
+
+    if(isLoading){
+
+        const chat = document.getElementById("chat");
+
+        const wrapper = document.createElement("div");
+
+        wrapper.className = "message";
+        wrapper.id = "loading";
+
+        wrapper.innerHTML = `
+            <div class="avatar">🤖</div>
+
+            <div class="bubble">
+                <div class="typing">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        `;
+
+        chat.appendChild(wrapper);
+
+        chat.scrollTop = chat.scrollHeight;
+
+    }else{
+
+        const loading = document.getElementById("loading");
+
+        if(loading){
+            loading.remove();
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   REMOVE WELCOME
+   ===================================================== */
+
+function removeWelcome(){
+
+    const welcome = document.getElementById("welcome");
+
+    if(welcome){
+        welcome.remove();
+    }
+
+}
+
+
+/* =====================================================
+   SUGGESTION
+   ===================================================== */
+
+function useSuggestion(text){
+
+    document.getElementById("input").value = text;
+
+    sendMessage();
+
+}
+
+
+/* =====================================================
+   SUBJECT
+   ===================================================== */
+
+function askSubject(subject){
+
+    const question =
+        "मुझे " + subject +
+        " पढ़ना है। मुझे एक महत्वपूर्ण school-level topic समझाओ।";
+
+    document.getElementById("input").value = question;
+
+    sendMessage();
+
+}
+
+
+/* =====================================================
+   NEW CHAT
+   ===================================================== */
+
+function newChat(){
+
+    messages = [];
+
+    const chat = document.getElementById("chat");
+
+    chat.innerHTML = `
+        <div class="welcome" id="welcome">
+
+            <div class="welcome-icon">
+                🤖
+            </div>
+
+            <h1>How can I help you learn?</h1>
+
+            <p>
+                Ask me questions about Maths, Science, History,
+                English, Hindi, GK and many other school subjects.
+            </p>
+
+            <div class="suggestions">
+
+                <div class="suggestion"
+                     onclick="useSuggestion('Explain Newton’s Second Law of Motion in simple Hindi.')">
+                    ⚡ Explain Newton's Second Law
+                </div>
+
+                <div class="suggestion"
+                     onclick="useSuggestion('Solve this mathematics problem step by step: 2x + 5 = 17')">
+                    📐 Solve a Maths problem
+                </div>
+
+                <div class="suggestion"
+                     onclick="useSuggestion('भारत के बारे में 5 महत्वपूर्ण सामान्य ज्ञान प्रश्न पूछो।')">
+                    🇮🇳 Ask me India GK
+                </div>
+
+                <div class="suggestion"
+                     onclick="useSuggestion('Explain photosynthesis in simple language.')">
+                    🌱 Explain Photosynthesis
+                </div>
+
+            </div>
+
+        </div>
+    `;
+
+}
+
+
+/* =====================================================
+   ENTER KEY
+   ===================================================== */
+
+function handleKey(event){
+
+    if(event.key === "Enter" && !event.shiftKey){
+
+        event.preventDefault();
+
+        sendMessage();
+
+    }
+
+}
+
+
+/* =====================================================
+   AUTO RESIZE TEXTAREA
+   ===================================================== */
+
+document
+    .getElementById("input")
+    .addEventListener("input",function(){
+
+        this.style.height = "42px";
+
+        this.style.height =
+            Math.min(this.scrollHeight,130) + "px";
+
+    });
+
+</script>
+
+</body>
+</html>
